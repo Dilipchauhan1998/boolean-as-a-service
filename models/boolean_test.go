@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -10,6 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type testBoolean struct {
+	boolean  Boolean
+	sqlQuery string
+	err      error
+}
+
 func TestCreateBoolean(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual)) //mock sql.DB
 	assert.Nil(t, err, "error while mocking database")
@@ -17,31 +24,52 @@ func TestCreateBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	booleanRepo := &BooleanRepo{db: gdb}
-	booleans := []Boolean{
+	NewBooleanRepo(gdb)
+	booleanRepo := BooleanRepo
+
+	testBooleans := []testBoolean{
 		{
-			ID:    uuid.New().String(),
-			Value: new(bool),
-			Key:   "name",
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+				Key:   "name",
+			},
+			sqlQuery: "INSERT INTO `booleans` (`id`,`value`,`key`) VALUES (?,?,?)",
+			err:      nil,
 		},
 		{
-			ID:    uuid.New().String(),
-			Value: new(bool),
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+			},
+			sqlQuery: "INSERT INTO `booleans` (`id`,`value`,`key`) VALUES (?,?,?)",
+			err:      nil,
+		},
+		{
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+				Key:   "name",
+			},
+			sqlQuery: "INSERT INTO `booleans` (`id`,`value`) VALUES (?,?)",
+			err:      errors.New("syntax error"),
 		},
 	}
 
-	const sqlInsert = "INSERT INTO `booleans` (`id`,`value`,`key`) VALUES (?,?,?)"
-
-	for _, boolean := range booleans {
+	for _, testboolean := range testBooleans {
 		mock.ExpectBegin() // start transaction
-		mock.ExpectExec(sqlInsert).
-			WithArgs(boolean.ID, boolean.Value, boolean.Key).
+		mock.ExpectExec(testboolean.sqlQuery).
+			WithArgs(testboolean.boolean.ID, testboolean.boolean.Value, testboolean.boolean.Key).
 			WillReturnResult(sqlmock.NewResult(0, 0))
 		mock.ExpectCommit() // commit transaction
 
-		err = booleanRepo.CreateBoolean(&boolean)
-		assert.Nil(t, err)
+		err = booleanRepo.CreateBoolean(&testboolean.boolean)
 
+		if testboolean.err != nil {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+		}
 	}
 
 }
@@ -53,35 +81,58 @@ func TestGetBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	booleanRepo := &BooleanRepo{db: gdb}
+	NewBooleanRepo(gdb)
+	booleanRepo := BooleanRepo
 
-	booleans := []Boolean{
+	testBooleans := []testBoolean{
 		{
-			ID:    uuid.New().String(),
-			Value: new(bool),
-			Key:   "name",
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+				Key:   "name",
+			},
+			sqlQuery: "SELECT * FROM `booleans` WHERE (id = ?)",
+			err:      nil,
 		},
 		{
-			ID:    uuid.New().String(),
-			Value: new(bool),
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+			},
+			sqlQuery: "SELECT * FROM `booleans` WHERE (id = ?)",
+			err:      nil,
+		},
+		{
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+				Key:   "name",
+			},
+			sqlQuery: "SELECT `id` FROM `booleans` WHERE (id = ?)",
+			err:      errors.New("syntax error"),
 		},
 	}
 
-	for _, boolean := range booleans {
+	for _, testboolean := range testBooleans {
 		rows := sqlmock.
 			NewRows([]string{"id", "value", "key"}).
-			AddRow(boolean.ID, boolean.Value, boolean.Key)
+			AddRow(testboolean.boolean.ID, testboolean.boolean.Value, testboolean.boolean.Key)
 
-		mock.ExpectQuery("SELECT * FROM `booleans` WHERE (id = ?)").
-			WithArgs(boolean.ID).
+		mock.ExpectQuery(testboolean.sqlQuery).
+			WithArgs(testboolean.boolean.ID).
 			WillReturnRows(rows)
 
 		var newBoolean Boolean
-		err = booleanRepo.GetBooleanByID(&newBoolean, boolean.ID)
-		assert.Nil(t, err)
-		assert.Equal(t, newBoolean.ID, boolean.ID)
-		assert.Equal(t, newBoolean.Key, boolean.Key)
-		assert.Equal(t, newBoolean.Value, boolean.Value)
+		err = booleanRepo.GetBooleanByID(&newBoolean, testboolean.boolean.ID)
+
+		if testboolean.err != nil {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+			assert.Equal(t, newBoolean.ID, testboolean.boolean.ID)
+			assert.Equal(t, newBoolean.Key, testboolean.boolean.Key)
+			assert.Equal(t, newBoolean.Value, testboolean.boolean.Value)
+		}
 	}
 }
 
@@ -92,29 +143,52 @@ func TestUpdateBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	booleanRepo := &BooleanRepo{db: gdb}
-	booleans := []Boolean{
+	NewBooleanRepo(gdb)
+	booleanRepo := BooleanRepo
+
+	testBooleans := []testBoolean{
 		{
-			ID:    uuid.New().String(),
-			Value: new(bool),
-			Key:   "name",
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+				Key:   "name",
+			},
+			sqlQuery: "UPDATE `booleans` SET `value` = ?, `key` = ? WHERE `booleans`.`id` = ?",
+			err:      nil,
 		},
 		{
-			ID:    uuid.New().String(),
-			Value: new(bool),
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+			},
+			sqlQuery: "UPDATE `booleans` SET `value` = ?, `key` = ? WHERE `booleans`.`id` = ?",
+			err:      nil,
+		},
+		{
+			boolean: Boolean{
+				ID:    uuid.New().String(),
+				Value: new(bool),
+				Key:   "name",
+			},
+			sqlQuery: "UPDATE `booleans` SET `value` = ? WHERE `booleans`.`id` = ?",
+			err:      errors.New("syntax error"),
 		},
 	}
 
-	const sqlUpdate = "UPDATE `booleans` SET `value` = ?, `key` = ? WHERE `booleans`.`id` = ?"
-	for _, boolean := range booleans {
+	for _, testboolean := range testBooleans {
 		mock.ExpectBegin()
-		mock.ExpectExec(sqlUpdate).
-			WithArgs(boolean.Value, boolean.Key, boolean.ID).
+		mock.ExpectExec(testboolean.sqlQuery).
+			WithArgs(testboolean.boolean.Value, testboolean.boolean.Key, testboolean.boolean.ID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
-		err = booleanRepo.UpdateBoolean(&boolean)
-		assert.Nil(t, err)
+		err = booleanRepo.UpdateBoolean(&testboolean.boolean)
+
+		if testboolean.err != nil {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+		}
 	}
 }
 
@@ -125,21 +199,42 @@ func TestDeleteBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	booleanRepo := &BooleanRepo{db: gdb}
-	id := uuid.New().String()
+	NewBooleanRepo(gdb)
+	booleanRepo := BooleanRepo
 
-	const sqlDelete = "DELETE FROM `booleans`  WHERE (id= ?)"
+	testBooleans := []testBoolean{
+		{
+			boolean: Boolean{
+				ID: uuid.New().String(),
+			},
+			sqlQuery: "DELETE FROM `booleans`  WHERE (id= ?)",
+			err:      nil,
+		},
+		{
+			boolean: Boolean{
+				ID: uuid.New().String(),
+			},
+			sqlQuery: "DELETE FROM `booleans` ",
+			err:      errors.New("some error"),
+		},
+	}
 
-	mock.ExpectBegin()
-	mock.ExpectExec(sqlDelete).
-		WithArgs(id).
-		WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectCommit()
+	for _, testboolean := range testBooleans {
 
-	var boolean Boolean
-	err = booleanRepo.DeleteBoolean(&boolean, id)
-	assert.Nil(t, err)
-	assert.Equal(t, boolean.ID, "")
-	assert.Equal(t, boolean.Value, (*bool)(nil))
-	assert.Equal(t, boolean.Key, "")
+		mock.ExpectBegin()
+		mock.ExpectExec(testboolean.sqlQuery).
+			WithArgs(testboolean.boolean.ID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		mock.ExpectCommit()
+
+		var boolean Boolean
+		err = booleanRepo.DeleteBooleanByID(&boolean, testboolean.boolean.ID)
+
+		if testboolean.err != nil {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+		}
+
+	}
 }
