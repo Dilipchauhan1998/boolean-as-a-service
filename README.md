@@ -35,15 +35,15 @@ Start the service
 ```
 ## API
 ```
-    base url: http://localhost/ 
+ base url: http://localhost/ 
 ```
 use __POST /__ method to create a new boolean
 __request:__
 ```
-    {
-      "value":true,
-       "key": "name" // this is optional
-    }
+ {
+   "value":true,
+    "key": "name" // this is optional
+ }
 ```
 - value should be either true or false(boolean, not string) <br />
 - key should be string <br />
