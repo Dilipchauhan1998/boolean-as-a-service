@@ -4,7 +4,7 @@
 - Handles POST, GET, PATCH and DELETE requests <br />
 
 ## Requirements
-- Mysql 8.0.21 or higher
+- mysql 8.0.21 or higher
 - go 1.15 or higher
 ## Configuration
 
