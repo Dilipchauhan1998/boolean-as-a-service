@@ -50,41 +50,41 @@ __request:__
 
 __response:__
 ```
-    {
-      "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-      "value": true,
-      "key": "name"
-    }
+ {
+   "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+   "value": true,
+   "key": "name"
+ }
 ```
 
 
 use __GET /:id__ method to get an existing boolean
 __response:__
 ```
-    {
-      "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-      "value": true,
-      "key": "name"
-    }
+ {
+   "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+   "value": true,
+   "key": "name"
+ }
 ```
 use __PATCH /:id__ method to update an existing boolean
 __request:__
 ```
-    {
-      "value":false,
-      "key": "new name" // this is optional
-    }
+ {
+   "value":false,
+   "key": "new name" // this is optional
+ }
 ```
 __response:__
 ```
-    {
-      "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-      "value": false,
-      "key": "new name"
-    }
+ {
+   "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+   "value": false,
+   "key": "new name"
+ }
 ```
 use __DELETE /:id__ method to delete an existing boolean
 __response:__
 ```
-HTTP 204 No Content
+ HTTP 204 No Content
 ```
