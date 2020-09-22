@@ -7,12 +7,10 @@ import (
 )
 
 func main() {
-	conn.ConnectDatabase()
 	db := conn.DB
 	db.AutoMigrate(&models.Boolean{})
 	defer db.Close()
 
 	router := routes.SetupRouter()
 	router.Run()
-
 }
