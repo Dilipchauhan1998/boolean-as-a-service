@@ -3,7 +3,6 @@ package controllers
 import (
 	"boolean-as-a-service/conn"
 	"boolean-as-a-service/models"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -16,80 +15,77 @@ func init() {
 	models.NewBooleanRepo(conn.DB)
 }
 
-//CreateBoolean  insert a boolean
+//CreateBoolean  create a boolean
 func CreateBoolean(c *gin.Context) {
 	var boolean models.Boolean
 	booleanRepo := models.BooleanRepo
 
-	err := c.BindJSON(&boolean)
-	if err != nil {
+	if err := c.BindJSON(&boolean); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
-	} else {
-
-		boolean.ID = uuid.New().String()
-
-		err := booleanRepo.CreateBoolean(&boolean)
-		if err != nil {
-			fmt.Println(err.Error())
-			c.AbortWithStatus(http.StatusNotFound)
-		} else {
-			c.JSON(http.StatusOK, boolean)
-		}
+		return
 	}
+
+	boolean.ID = uuid.New().String()
+	if err := booleanRepo.CreateBoolean(&boolean); err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, boolean)
 }
 
-//GetBoolean  Get a boolean
+//GetBoolean  get a boolean
 func GetBoolean(c *gin.Context) {
 	var boolean models.Boolean
 	booleanRepo := models.BooleanRepo
+
 	id := c.Params.ByName("id")
-	fmt.Println("id:", id)
-	err := booleanRepo.GetBooleanByID(&boolean, id)
-	if err != nil {
-		fmt.Println("err:", err)
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		fmt.Println("not err:", err)
-		c.JSON(http.StatusOK, boolean)
+	if err := booleanRepo.GetBooleanByID(&boolean, id); err != nil {
+		if err.Error() == "record not found" {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
+
+	c.JSON(http.StatusOK, boolean)
+
 }
 
 //UpdateBoolean  update a boolean
 func UpdateBoolean(c *gin.Context) {
 	var boolean models.Boolean
 	booleanRepo := models.BooleanRepo
+
 	id := c.Params.ByName("id")
-
-	err := c.BindJSON(&boolean)
-
-	if err != nil {
+	if err := c.BindJSON(&boolean); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
-	} else {
-		var booln models.Boolean
-		err := booleanRepo.GetBooleanByID(&booln, id)
-		if err != nil {
-			c.AbortWithStatus(http.StatusNotFound)
-			return
-		}
-
-		var nilBoolean models.Boolean
-		if booln == nilBoolean {
-			c.AbortWithStatus(http.StatusNotFound)
-			return
-		}
-
-		boolean.ID = id
-		if strings.Compare(boolean.Key, "") == 0 {
-			boolean.Key = booln.Key
-		}
-
-		err = booleanRepo.UpdateBoolean(&boolean)
-		if err != nil {
-			c.AbortWithStatus(http.StatusNotFound)
-		} else {
-			c.JSON(http.StatusOK, boolean)
-		}
+		return
 	}
+
+	var booln models.Boolean
+	if err := booleanRepo.GetBooleanByID(&booln, id); err != nil {
+		if err.Error() == "record not found" {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	boolean.ID = id
+	if strings.Compare(boolean.Key, "") == 0 {
+		boolean.Key = booln.Key
+	}
+
+	if err := booleanRepo.UpdateBoolean(&boolean); err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, boolean)
 
 }
 
@@ -99,19 +95,21 @@ func DeleteBoolean(c *gin.Context) {
 	booleanRepo := models.BooleanRepo
 
 	id := c.Params.ByName("id")
-
-	//check if the boolean exists with given id
 	if err := booleanRepo.GetBooleanByID(&boolean, id); err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		if err.Error() == "record not found" {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
 	boolean = models.Boolean{}
-	err := booleanRepo.DeleteBoolean(&boolean, id)
-
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		c.AbortWithStatus(http.StatusNoContent)
+	if err := booleanRepo.DeleteBooleanByID(&boolean, id); err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
+
+	c.AbortWithStatus(http.StatusNoContent)
 }
