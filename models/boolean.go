@@ -4,26 +4,29 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//BooleanRepoInterface ...
-type BooleanRepoInterface interface {
-	CreateBoolean(boolean *Boolean) error
-	GetBooleanByID(boolean *Boolean, id string) error
-	UpdateBoolean(boolean *Boolean) error
-	DeleteBoolean(boolean *Boolean, id string) (err error)
-}
-
-//BooleanRepo ...
-type BooleanRepo struct {
+type booleanRepo struct {
 	db *gorm.DB
 }
 
-//NewBooleanRepo ...
-func NewBooleanRepo(db *gorm.DB) *BooleanRepo {
-	return &BooleanRepo{db: db}
+type booleanRepoInterface interface {
+	CreateBoolean(boolean *Boolean) error
+	GetBooleanByID(boolean *Boolean, id string) error
+	UpdateBoolean(boolean *Boolean) error
+	DeleteBooleanByID(boolean *Boolean, id string) (err error)
 }
 
-//CreateBoolean ... insert new Boolean to database
-func (br *BooleanRepo) CreateBoolean(boolean *Boolean) error {
+//BooleanRepo ...
+var (
+	BooleanRepo booleanRepoInterface
+)
+
+//NewBooleanRepo ...
+func NewBooleanRepo(db *gorm.DB) {
+	BooleanRepo = &booleanRepo{db: db}
+}
+
+//CreateBoolean ... insert a new boolean to database
+func (br *booleanRepo) CreateBoolean(boolean *Boolean) error {
 	if err := br.db.Create(boolean).Error; err != nil {
 		return err
 	}
@@ -31,23 +34,23 @@ func (br *BooleanRepo) CreateBoolean(boolean *Boolean) error {
 }
 
 //GetBooleanByID ...  select a boolean based on its id
-func (br *BooleanRepo) GetBooleanByID(boolean *Boolean, id string) error {
+func (br *booleanRepo) GetBooleanByID(boolean *Boolean, id string) error {
 	if err := br.db.Where(`id = ?`, id).Find(boolean).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-//UpdateBoolean ...  update a boolean based on its id
-func (br *BooleanRepo) UpdateBoolean(boolean *Boolean) error {
+//UpdateBoolean ...  update a boolean
+func (br *booleanRepo) UpdateBoolean(boolean *Boolean) error {
 	if err := br.db.Save(&boolean).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-//DeleteBoolean ... delete a boolean based on its id
-func (br *BooleanRepo) DeleteBoolean(boolean *Boolean, id string) error {
+//DeleteBooleanByID ... delete a boolean based on its id
+func (br *booleanRepo) DeleteBooleanByID(boolean *Boolean, id string) error {
 	if err := br.db.Where("id= ?", id).Delete(boolean).Error; err != nil {
 		return err
 	}
