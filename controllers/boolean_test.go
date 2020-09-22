@@ -4,7 +4,7 @@ import (
 	"boolean-as-a-service/models"
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -36,7 +36,7 @@ func (br *booleanRepoMock) UpdateBoolean(boolean *models.Boolean) error {
 	return updateBooleanFunc(boolean)
 }
 
-func (br *booleanRepoMock) DeleteBoolean(boolean *models.Boolean, id string) error {
+func (br *booleanRepoMock) DeleteBooleanByID(boolean *models.Boolean, id string) error {
 	return deleteBooleanFunc(boolean, id)
 }
 
@@ -56,9 +56,6 @@ func TestCreateBooleanBadRequest(t *testing.T) {
 	models.BooleanRepo = &booleanRepoMock{}
 	for _, testRequest := range testRequests {
 		createBooleanFunc = func(boolean *models.Boolean) error {
-			boolean.ID = uuid.New().String()
-			boolean.Value = testRequest.Value
-			boolean.Key = testRequest.Key
 			return nil
 		}
 
@@ -74,11 +71,42 @@ func TestCreateBooleanBadRequest(t *testing.T) {
 
 		CreateBoolean(c)
 		assert.Equal(t, response.Code, http.StatusBadRequest)
-
 	}
 }
 
-func TestCreateBooleanStatusOk(t *testing.T) {
+func TestCreateBooleanStatusInternalServerError(t *testing.T) {
+	values := []bool{true, false}
+	testRequests := []booleanRequest{
+		{
+			Value: &values[0],
+			Key:   "This is test1",
+		},
+		{
+			Value: &values[1],
+		},
+	}
+
+	models.BooleanRepo = &booleanRepoMock{}
+	for _, testRequest := range testRequests {
+		createBooleanFunc = func(boolean *models.Boolean) error {
+			return errors.New("some kind of internal error")
+		}
+
+		jsonRequest, err := json.Marshal(booleanRequest{
+			Value: testRequest.Value,
+			Key:   testRequest.Key,
+		})
+		assert.Nil(t, err)
+		response := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(response)
+		c.Request, _ = http.NewRequest(http.MethodGet, "", bytes.NewBuffer(jsonRequest))
+
+		CreateBoolean(c)
+		assert.Equal(t, response.Code, http.StatusInternalServerError)
+	}
+}
+
+func TestCreateBooleanStatusOK(t *testing.T) {
 	values := []bool{true, false}
 	testRequests := []booleanRequest{
 		{
@@ -127,7 +155,7 @@ func TestGetBooleanStatusNotFound(t *testing.T) {
 	models.BooleanRepo = &booleanRepoMock{}
 	for _, testRequest := range testRequests {
 		getBooleanFunc = func(boolean *models.Boolean, id string) error {
-			return fmt.Errorf("id doesn't exists")
+			return errors.New("record not found")
 		}
 
 		response := httptest.NewRecorder()
@@ -142,7 +170,39 @@ func TestGetBooleanStatusNotFound(t *testing.T) {
 	}
 }
 
-func TestGetBooleanStatusOk(t *testing.T) {
+func TestGetBooleanStatusInternalServerError(t *testing.T) {
+	values := []bool{true, false}
+	testRequests := []models.Boolean{
+		{
+			ID:    uuid.New().String(),
+			Value: &values[0],
+			Key:   "test 1",
+		},
+		{
+			ID:    uuid.New().String(),
+			Value: &values[1],
+		},
+	}
+
+	models.BooleanRepo = &booleanRepoMock{}
+	for _, testRequest := range testRequests {
+		getBooleanFunc = func(boolean *models.Boolean, id string) error {
+			return errors.New("some kind of internal error")
+		}
+
+		response := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(response)
+		c.Request, _ = http.NewRequest(http.MethodGet, "", nil)
+		c.Params = gin.Params{
+			{Key: "id", Value: testRequest.ID},
+		}
+
+		GetBoolean(c)
+		assert.Equal(t, response.Code, http.StatusInternalServerError)
+	}
+}
+
+func TestGetBooleanStatusOK(t *testing.T) {
 	values := []bool{true, false}
 	testRequests := []models.Boolean{
 		{
@@ -244,7 +304,7 @@ func TestUpdateBooleanStatusNotFound(t *testing.T) {
 	for _, testRequest := range testRequests {
 
 		getBooleanFunc = func(boolean *models.Boolean, id string) error {
-			return nil
+			return errors.New("record not found")
 		}
 
 		updateBooleanFunc = func(boolean *models.Boolean) error {
@@ -266,6 +326,62 @@ func TestUpdateBooleanStatusNotFound(t *testing.T) {
 
 		UpdateBoolean(c)
 		assert.Equal(t, response.Code, http.StatusNotFound)
+
+	}
+}
+
+func TestUpdateBooleanStatusInternalServerError(t *testing.T) {
+	values := []bool{true, false}
+	testRequests := []models.Boolean{
+		{
+			ID:    uuid.New().String(),
+			Value: &values[0],
+			Key:   "This is test1",
+		},
+		{
+			ID:    uuid.New().String(),
+			Value: &values[1],
+		},
+	}
+
+	models.BooleanRepo = &booleanRepoMock{}
+	for i, testRequest := range testRequests {
+
+		getBooleanFunc = func(boolean *models.Boolean, id string) error {
+			if i == 0 {
+				return errors.New("some kind of internal error")
+			}
+
+			val := true
+			boolean.ID = testRequest.ID
+			boolean.Value = &val
+			boolean.Key = "This is key"
+			return nil
+		}
+
+		updateBooleanFunc = func(boolean *models.Boolean) error {
+
+			if i == 1 {
+				return errors.New("some kind of internal error")
+			}
+			return nil
+		}
+
+		jsonRequest, err := json.Marshal(booleanRequest{
+			Value: testRequest.Value,
+			Key:   testRequest.Key,
+		})
+		assert.Nil(t, err)
+
+		response := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(response)
+		c.Request, _ = http.NewRequest(http.MethodGet, "", bytes.NewBuffer(jsonRequest))
+		c.Params = gin.Params{
+			{Key: "id", Value: testRequest.ID},
+		}
+
+		UpdateBoolean(c)
+		assert.Equal(t, response.Code, http.StatusInternalServerError)
 
 	}
 }
@@ -343,7 +459,7 @@ func TestDeleteBooleanStatusNotFound(t *testing.T) {
 	for _, testRequest := range testRequests {
 
 		getBooleanFunc = func(boolean *models.Boolean, id string) error {
-			return fmt.Errorf("id doesn't exists")
+			return errors.New("record not found")
 		}
 
 		deleteBooleanFunc = func(boolean *models.Boolean, id string) error {
@@ -359,6 +475,51 @@ func TestDeleteBooleanStatusNotFound(t *testing.T) {
 
 		DeleteBoolean(c)
 		assert.Equal(t, response.Code, http.StatusNotFound)
+	}
+}
+
+func TestDeleteBooleanStatusInternalServerError(t *testing.T) {
+	values := []bool{true, false}
+	testRequests := []models.Boolean{
+		{
+			ID:    uuid.New().String(),
+			Value: &values[0],
+			Key:   "test 1",
+		},
+		{
+			ID:    uuid.New().String(),
+			Value: &values[1],
+		},
+	}
+
+	models.BooleanRepo = &booleanRepoMock{}
+	for i, testRequest := range testRequests {
+		getBooleanFunc = func(boolean *models.Boolean, id string) error {
+			if i == 0 {
+				return errors.New("some kind of internal error")
+			}
+			boolean.ID = testRequest.ID
+			boolean.Value = testRequest.Value
+			boolean.Key = testRequest.Key
+			return nil
+		}
+
+		deleteBooleanFunc = func(boolean *models.Boolean, id string) error {
+			if i == 1 {
+				return errors.New("some kind of internal error")
+			}
+			return nil
+		}
+
+		response := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(response)
+		c.Request, _ = http.NewRequest(http.MethodGet, "", nil)
+		c.Params = gin.Params{
+			{Key: "id", Value: testRequest.ID},
+		}
+
+		DeleteBoolean(c)
+		assert.Equal(t, response.Code, http.StatusInternalServerError)
 	}
 }
 
