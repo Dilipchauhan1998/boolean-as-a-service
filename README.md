@@ -33,57 +33,58 @@ Start the service
 ```sh
  $ go run main.go
 ```
+## API
+```
+    base url: http://localhost/ 
+```
+use __POST /__ method to create a new boolean
+__request:__
+```
+    {
+      "value":true,
+       "key": "name" // this is optional
+    }
+```
+- value should be either true or false(boolean, not string) <br />
+- key should be string <br />
 
-## APIs
+__response:__
 ```
-base url: http://localhost/ 
+    {
+      "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+      "value": true,
+      "key": "name"
+    }
 ```
-### POST /
-#### request:
-```
-{
-  "value":true,
-   "key": "name" // this is optional
-}
-```
-#### response:
-```
-{
-  "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-  "value": true,
-  "key": "name"
-}
-```
-value should be either true or false(boolean, not string) <br />
-key should be string <br />
 
-### GET / :id
-#### response:
+
+use __GET /:id__ method to get an existing boolean
+__response:__
 ```
-{
-  "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-  "value": true,
-  "key": "name"
-}
+    {
+      "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+      "value": true,
+      "key": "name"
+    }
 ```
-### PATCH/:id
-#### request:
+use __PATCH /:id__ method to update an existing boolean
+__request:__
 ```
-{
-  "value":false,
-  "key": "new name" // this is optional
-}
+    {
+      "value":false,
+      "key": "new name" // this is optional
+    }
 ```
-#### response:
+__response:__
 ```
-{
-  "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-  "value": false,
-  "key": "new name"
-}
+    {
+      "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+      "value": false,
+      "key": "new name"
+    }
 ```
-### DELETE /:id
-#### response:
+use __DELETE /:id__ method to delete an existing boolean
+__response:__
 ```
 HTTP 204 No Content
 ```
