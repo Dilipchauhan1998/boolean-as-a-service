@@ -33,3 +33,54 @@ Start the service
 ```sh
  $ go run main.go
 ```
+
+## APIs
+### POST /
+#### request:
+```
+{
+  "value":true,
+   "key": "name" // this is optional
+}
+```
+#### response:
+```
+{
+  "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+  "value": true,
+  "key": "name"
+}
+```
+value should be either true or false(boolean, not string)
+key should be string
+
+### GET / :id
+#### response:
+```
+{
+  "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+  "value": true,
+  "key": "name"
+}
+```
+### PATCH/:id
+#### request:
+```
+{
+  "value":false,
+  "key": "new name" // this is optional
+}
+```
+#### response:
+```
+{
+  "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+  "value": false,
+  "key": "new name"
+}
+```
+### DELETE /:id
+#### response:
+```
+HTTP 204 No Content
+```
