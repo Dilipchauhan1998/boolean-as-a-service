@@ -25,11 +25,11 @@ Install all required packages <br />
 ```sh
  $ go get
 ```
-run below command for setting ENVIRONMENT variables
+Run below command for setting ENVIRONMENT variables
 ```sh
  $ source .env
 ```
-start the service
+Start the service
 ```sh
  $ go run main.go
 ```
