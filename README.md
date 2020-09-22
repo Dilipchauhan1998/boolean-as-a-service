@@ -51,8 +51,8 @@ Start the service
   "key": "name"
 }
 ```
-value should be either true or false(boolean, not string)
-key should be string
+value should be either true or false(boolean, not string) <br />
+key should be string <br />
 
 ### GET / :id
 #### response:
