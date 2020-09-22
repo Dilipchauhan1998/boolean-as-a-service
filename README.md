@@ -1,20 +1,35 @@
 # Boolean As a Service 
-- can create a new boolean
-- can get a boolean
-- can update an existing boolean
-- delete an existing boolean
+A service which can be used to create, delete and update boolean values
+Provides REST endpoints for each operation
+Handles POST, GET, PATCH and DELETE requests
 
-# Prerequites
-- Mysql database
-- go 1.15
-# Installation
-Clone the repository and keep it in the GOPATH
-```sh
-    $ cd boolean-as-a-service
-    $ go get
+## Requirements
+- Mysql 8.0.21 or higher
+- go 1.15 or higher
+## Configuration
+
+Edit the following lines in the files ".env":
+
 ```
-Edit the content of .env and set to as per requirements
+export MYSQL_DB_USER="xxxxxx"     
+export MYSQL_DB_PASS="xxxxxx"
+export MYSQL_DB_NAME="xxxxxx"
+```
+## Installation
+Clone the repository and keep it in the $GOPATH
+Open the terminal and run
 ```sh
-    $ source .env
-    $ run main.go
+ $ cd path-to-boolean-as-a-service/boolean-as-a-service
+```
+Install all required packages
+```sh
+ $ go get
+```
+run below command for setting ENVIRONMENT variables
+```sh
+ $ source .env
+```
+start the service
+```sh
+ $ go run main.go
 ```
