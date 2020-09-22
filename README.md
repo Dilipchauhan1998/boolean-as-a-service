@@ -35,6 +35,9 @@ Start the service
 ```
 
 ## APIs
+```
+base url: htttp://localhost/ 
+```
 ### POST /
 #### request:
 ```
