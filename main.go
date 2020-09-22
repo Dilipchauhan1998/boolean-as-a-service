@@ -12,5 +12,5 @@ func main() {
 	defer db.Close()
 
 	router := routes.SetupRouter()
-	router.Run()
+	router.Run(":80")
 }
