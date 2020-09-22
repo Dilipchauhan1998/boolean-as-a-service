@@ -8,7 +8,7 @@
 - go 1.15 or higher
 ## Configuration
 
-Edit the following lines in the files ".env":
+Edit the following lines in the files ".env": <br />
 
 ```
 export MYSQL_DB_USER="xxxxxx"     
@@ -16,12 +16,12 @@ export MYSQL_DB_PASS="xxxxxx"
 export MYSQL_DB_NAME="xxxxxx"
 ```
 ## Installation
-Clone the repository and keep it in the $GOPATH
-Open the terminal and run
+Clone the repository and keep it in the $GOPATH <br />
+Open the terminal and run <br />
 ```sh
  $ cd path-to-boolean-as-a-service/boolean-as-a-service
 ```
-Install all required packages
+Install all required packages <br />
 ```sh
  $ go get
 ```
