@@ -40,9 +40,6 @@ ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 RUN go version
 ENV MYSQL_DB_HOST localhost
-ENV MYSQL_DB_USER dev
-ENV MYSQL_DB_PASS dev
-ENV MYSQL_DB_NAME userdb
 RUN mkdir $GOPATH/boolean-as-a-service
 
 COPY . .$GOPATH/boolean-as-a-service
