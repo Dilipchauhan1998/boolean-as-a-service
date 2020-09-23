@@ -6,6 +6,10 @@ MYSQL_USER=${MYSQL_USER:-""}
 MYSQL_USER_PWD=${MYSQL_USER_PWD:-""}
 MYSQL_USER_DB=${MYSQL_USER_DB:-""}
 
+export MYSQL_DB_USER=$MYSQL_USER
+export MYSQL_DB_PASS=$MYSQL_USER_PWD
+export MYSQL_DB_NAME=$MYSQL_USER_DB
+
 echo "[i] Setting up new power user credentials."
 service mysql start $ sleep 10
 
@@ -34,8 +38,8 @@ else
 	fi
 fi
 
-#killall mysqld
 sleep 5
-echo "[i] Setting end,have fun."
-go run $GOPATH/boolean-as-a-service/main.go 
+echo "[i] Setting end,have fun." 
+go build $GOPATH/boolean-as-a-service/main.go 
+$GOPATH/boolean-as-a-service/main
 exec "$@"
