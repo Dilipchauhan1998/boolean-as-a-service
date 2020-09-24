@@ -34,25 +34,47 @@ export MYSQL_DB_USER="username"
 export MYSQL_DB_PASS="password"
 export MYSQL_DB_NAME="database_name"
 ```
-
 ## Installation
-Clone the repository and keep it in the $GOPATH <br />
-Open the terminal and run <br />
-```sh
- $ cd path-to-boolean-as-a-service/boolean-as-a-service
-```
-Install all required packages <br />
-```sh
- $ go mod download
-```
-Run below command for setting ENVIRONMENT variables
-```sh
- $ source .env
-```
-Start the service
-```sh
- $ go run main.go
-```
+### Without Docker
+- Clone the repository and keep it in the $GOPATH
+- Open the terminal and ``` cd ``` to the cloned repository directory
+    ```sh
+     $ cd paths/boolean-as-a-service
+    ```
+- Install all required packages
+    ```sh
+     $ go mode download
+    ```
+- Run below command for setting database related ENVIRONMENT variables
+    ```sh
+     $ source .env
+    ```
+- Build the service 
+    ```sh
+     $ go build main.go
+    ```
+- Run the service 
+   ```sh
+    $ ./main
+   ```
+   
+### With Docker
+Go to [boolean-as-a-service](https://hub.docker.com/r/dilipchauhan1998/boolean-as-a-service) for the docker image of the boolean service
+
+- Pull the image to local machine using command
+    ```sh
+    $ docker pull dilipchauhan1998/boolean-as-a-service
+    ```
+- Start boolean-as-a-service instance
+    ```sh
+    docker run --name boolean -p 80:80 dilipchauhan1998/boolean-as-a-service
+    ```
+- Start boolean-as-a-service with your own database configuration  
+     ```sh
+     docker run --name boolean -p 80:80 -e MYSQL_USER=dev -e MYSQL_USER_PWD=dev -e MYSQL_USER_DB=userdb dilipchauhan1998/boolean-as-a-service
+
+     ```
+
 ## API
 ```
  base url: http://localhost/ 
