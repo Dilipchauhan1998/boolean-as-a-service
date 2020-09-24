@@ -90,5 +90,5 @@ __response:__
 ```
 ## Container
 
-Go to [a link](https://hub.docker.com/r/dilipchauhan1998/boolean-as-a-service) for docker image for boolean-as-a-service 
+Go to [boolean-as-a-service](https://hub.docker.com/r/dilipchauhan1998/boolean-as-a-service) for the docker image of the service
 
