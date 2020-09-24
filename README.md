@@ -5,8 +5,13 @@
 - Handles POST, GET, PATCH and DELETE requests <br />
 
 ## Requirements
-- mysql 8.0.21 or higher
-- go 1.15 or higher
+__Mysql 8.0.21 or higher__
+To install mysql on  macOS follow [install mysql](https://flaviocopes.com/mysql-how-to-install/)
+
+__go 1.15 or higher__
+To install go on macOS follow [install go](https://www.geeksforgeeks.org/how-to-install-golang-on-macos/)
+
+
 ## Configuration
 
 Edit the following lines in the files ".env": <br />
