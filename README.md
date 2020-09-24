@@ -12,22 +12,22 @@ To install mysql on  macOS follow [install mysql](https://flaviocopes.com/mysql-
 To install go on macOS follow [install go](https://www.geeksforgeeks.org/how-to-install-golang-on-macos/) <br />
 
 ## Configuration
-### mysql
-Create a new user
+
+- Create a new user
 ```
 mysql> CREATE USER 'usernamer'@'localhost' IDENTIFIED BY 'password';
 ```
-Create a database
+- Create a database
 ```
 mysql> CREATE DATABASE database_name
 ```
-Give the created user all privileges on the created database
+- Give the created user all privileges on the created database
 ```
 mysql> GRANT ALL PRIVILEGES ON database_name.* TO 'username'@'localhost' identified by 'password';
 mysql> FLUSH PRIVILEGES;
 ```
 
-Edit the following lines in the files ".env":
+- Edit the following lines in the files ".env":
 
 ```
 export MYSQL_DB_USER="username"     
