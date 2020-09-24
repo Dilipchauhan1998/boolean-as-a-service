@@ -23,7 +23,7 @@ Open the terminal and run <br />
 ```
 Install all required packages <br />
 ```sh
- $ go get
+ $ go mod download
 ```
 Run below command for setting ENVIRONMENT variables
 ```sh
