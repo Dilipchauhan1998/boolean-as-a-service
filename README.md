@@ -11,16 +11,30 @@ To install mysql on  macOS follow [install mysql](https://flaviocopes.com/mysql-
 - __go 1.15 or higher__ <br />
 To install go on macOS follow [install go](https://www.geeksforgeeks.org/how-to-install-golang-on-macos/) <br />
 
-
 ## Configuration
+### mysql
+Create a new user
+```
+mysql> CREATE USER 'usernamer'@'localhost' IDENTIFIED BY 'password';
+```
+Create a database
+```
+mysql> CREATE DATABASE database_name
+```
+Give the created user all privileges on the created database
+```
+mysql> GRANT ALL PRIVILEGES ON database_name.* TO 'username'@'localhost' identified by 'password';
+mysql> FLUSH PRIVILEGES;
+```
 
-Edit the following lines in the files ".env": <br />
+Edit the following lines in the files ".env":
 
 ```
-export MYSQL_DB_USER="xxxxxx"     
-export MYSQL_DB_PASS="xxxxxx"
-export MYSQL_DB_NAME="xxxxxx"
+export MYSQL_DB_USER="username"     
+export MYSQL_DB_PASS="password"
+export MYSQL_DB_NAME="database_name"
 ```
+
 ## Installation
 Clone the repository and keep it in the $GOPATH <br />
 Open the terminal and run <br />
