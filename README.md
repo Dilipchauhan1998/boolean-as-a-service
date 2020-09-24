@@ -1,6 +1,7 @@
 # Boolean As a Service 
-- A service which can be used to create, delete and update boolean values <br />
-- Provides REST endpoints for each operation <br />
+- Ability to create, get, update and delete a boolean value <br />
+- Storing the data in mysql database <br />
+- Exposing  RESTful endpoints for each operation <br />
 - Handles POST, GET, PATCH and DELETE requests <br />
 
 ## Requirements
