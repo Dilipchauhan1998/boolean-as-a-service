@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	conn.ConnectDB()
 	db := conn.DB
 	db.AutoMigrate(&models.Boolean{})
 	defer db.Close()
