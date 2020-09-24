@@ -77,7 +77,7 @@ Go to [boolean-as-a-service](https://hub.docker.com/r/dilipchauhan1998/boolean-a
 
 ## API
 ```
- base url: http://localhost/ 
+ __base url:__ http://localhost/ 
 ```
 use __POST /__ method to create a new boolean
 __request:__
