@@ -24,7 +24,7 @@ func TestCreateBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	NewBooleanRepo(gdb)
+	SetBooleanRepo(gdb)
 	booleanRepo := BooleanRepo
 
 	testBooleans := []testBoolean{
@@ -63,7 +63,7 @@ func TestCreateBoolean(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(0, 0))
 		mock.ExpectCommit() // commit transaction
 
-		err = booleanRepo.CreateBoolean(&testboolean.boolean)
+		err = booleanRepo.CreateBoolean(testboolean.boolean)
 
 		if testboolean.err != nil {
 			assert.NotNil(t, err)
@@ -81,7 +81,7 @@ func TestGetBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	NewBooleanRepo(gdb)
+	SetBooleanRepo(gdb)
 	booleanRepo := BooleanRepo
 
 	testBooleans := []testBoolean{
@@ -123,7 +123,7 @@ func TestGetBoolean(t *testing.T) {
 			WillReturnRows(rows)
 
 		var newBoolean Boolean
-		err = booleanRepo.GetBooleanByID(&newBoolean, testboolean.boolean.ID)
+		newBoolean, err = booleanRepo.GetBooleanByID(testboolean.boolean.ID)
 
 		if testboolean.err != nil {
 			assert.NotNil(t, err)
@@ -143,7 +143,7 @@ func TestUpdateBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	NewBooleanRepo(gdb)
+	SetBooleanRepo(gdb)
 	booleanRepo := BooleanRepo
 
 	testBooleans := []testBoolean{
@@ -182,7 +182,7 @@ func TestUpdateBoolean(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
-		err = booleanRepo.UpdateBoolean(&testboolean.boolean)
+		err = booleanRepo.UpdateBoolean(testboolean.boolean)
 
 		if testboolean.err != nil {
 			assert.NotNil(t, err)
@@ -199,7 +199,7 @@ func TestDeleteBoolean(t *testing.T) {
 	gdb, err := gorm.Open("mysql", db) // open gorm db
 	assert.Nil(t, err)
 
-	NewBooleanRepo(gdb)
+	SetBooleanRepo(gdb)
 	booleanRepo := BooleanRepo
 
 	testBooleans := []testBoolean{
@@ -227,8 +227,7 @@ func TestDeleteBoolean(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(0, 0))
 		mock.ExpectCommit()
 
-		var boolean Boolean
-		err = booleanRepo.DeleteBooleanByID(&boolean, testboolean.boolean.ID)
+		err = booleanRepo.DeleteBooleanByID(testboolean.boolean.ID)
 
 		if testboolean.err != nil {
 			assert.NotNil(t, err)
