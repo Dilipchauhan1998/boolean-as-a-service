@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"boolean-as-a-service/conn"
 	"boolean-as-a-service/models"
 	"net/http"
 	"strings"
@@ -10,10 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-func init() {
-	models.NewBooleanRepo(conn.DB)
-}
 
 //CreateBoolean  create a boolean
 func CreateBoolean(c *gin.Context) {
