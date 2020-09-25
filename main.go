@@ -11,7 +11,7 @@ func main() {
 	db := conn.DB
 	db.AutoMigrate(&models.Boolean{})
 	defer db.Close()
-	models.NewBooleanRepo(conn.DB)
+	models.SetBooleanRepo(conn.DB)
 
 	router := routes.SetupRouter()
 	router.Run(":80")
