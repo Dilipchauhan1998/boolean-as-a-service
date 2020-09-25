@@ -59,9 +59,9 @@ export MYSQL_DB_NAME="database_name"
    ```
    
 ### With Docker
-Go to [boolean](https://hub.docker.com/r/dilipchauhan1998/boolean-as-a-service) for the docker image of the boolean service
+Go to [boolean](https://hub.docker.com/r/dilipchauhan1998/boolean) for the docker image of the boolean service
 
-__Create Docker Image__
+__Create docker image__
 - Clone the repository and ```cd``` to the cloned repository directory 
     ```sh
     $ cd paths/boolean-as-a-service
@@ -70,19 +70,20 @@ __Create Docker Image__
      ```sh
     $ docker build . -t dilipchauhan1998/boolean
     ```
-__OR__
+__OR pull image from docker hub__
 
 - Pull the image to local machine using command
     ```sh
-    $ docker pull dilipchauhan1998/boolean-as-a-service
+    $ docker pull dilipchauhan1998/boolean
     ```
-- Start boolean-as-a-service instance
+__Start boolean service__     
+- Start default instance
     ```sh
-    $ docker run --name boolean -p 80:80 dilipchauhan1998/boolean-as-a-service
+    $ docker run --name boolean -p 80:80 dilipchauhan1998/boolean
     ```
-- Start boolean-as-a-service with your own database configuration  
+- Start boolean service with your own database configuration  
      ```sh
-     $ docker run --name boolean -p 80:80 -e MYSQL_USER=dev -e MYSQL_USER_PWD=dev -e MYSQL_USER_DB=userdb dilipchauhan1998/boolean-as-a-service
+     $ docker run --name boolean -p 80:80 -e MYSQL_USER=dev -e MYSQL_USER_PWD=dev -e MYSQL_USER_DB=userdb dilipchauhan1998/boolean
 
      ```
 
