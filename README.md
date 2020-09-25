@@ -59,7 +59,7 @@ export MYSQL_DB_NAME="database_name"
    ```
    
 ### With Docker
-Go to [boolean](https://hub.docker.com/r/dilipchauhan1998/boolean) for the docker image of the boolean service
+Go to [boolean](https://hub.docker.com/repository/docker/dilipchauhan1998/boolean) for the docker image of the boolean service
 
 __Create docker image__
 - Clone the repository and ```cd``` to the cloned repository directory 
@@ -70,7 +70,7 @@ __Create docker image__
      ```sh
     $ docker build . -t dilipchauhan1998/boolean
     ```
-__OR pull image from docker hub__
+__Or pull image from docker hub__
 
 - Pull the image to local machine using command
     ```sh
