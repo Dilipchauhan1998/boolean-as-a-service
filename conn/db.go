@@ -11,10 +11,6 @@ import (
 //DB store connection to the mysql database
 var DB *gorm.DB
 
-func init() {
-	DB = nil
-}
-
 //ConnectDB connects to the mysql database, exited if error encountered
 func ConnectDB() {
 	dbHost := os.Getenv("MYSQL_DB_HOST")
