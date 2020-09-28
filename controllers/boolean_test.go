@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"boolean-as-a-service/auth"
 	"boolean-as-a-service/mocks"
 	"boolean-as-a-service/models"
 	"bytes"
@@ -21,6 +22,61 @@ type booleanRequest struct {
 	Key   string `json:"key"`
 }
 
+func TestCreateTokenInternalServerError(t *testing.T) {
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().CreateToken(gomock.Any()).Return(errors.New("some kind of internal error"))
+
+	response := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(response)
+	req, err := http.NewRequest(http.MethodPost, "", nil)
+	assert.Nil(t, err)
+	c.Request = req
+
+	CreateToken(c)
+	assert.Equal(t, response.Code, http.StatusInternalServerError)
+
+}
+
+func TestCreateTokenStatusOK(t *testing.T) {
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokenRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokenRepoInterface
+	mocktokenRepoInterface.EXPECT().CreateToken(gomock.Any()).Return(nil)
+
+	response := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(response)
+	req, err := http.NewRequest(http.MethodPost, "", nil)
+	assert.Nil(t, err)
+	c.Request = req
+
+	CreateToken(c)
+	assert.Equal(t, response.Code, http.StatusOK)
+
+}
+
+func TestCreateBooleanStatusForbidden(t *testing.T) {
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(false)
+
+	response := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(response)
+	req, err := http.NewRequest(http.MethodPost, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
+
+	CreateBoolean(c)
+	assert.Equal(t, response.Code, http.StatusForbidden)
+
+}
+
 func TestCreateBooleanBadRequest(t *testing.T) {
 	testRequests := []booleanRequest{
 		{
@@ -28,6 +84,12 @@ func TestCreateBooleanBadRequest(t *testing.T) {
 		},
 		{},
 	}
+
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true).Times(len(testRequests))
 
 	for _, testRequest := range testRequests {
 
@@ -39,7 +101,10 @@ func TestCreateBooleanBadRequest(t *testing.T) {
 
 		response := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(response)
-		c.Request, _ = http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+		req, err := http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+		assert.Nil(t, err)
+		req.Header.Add("Authorization", "Token "+uuid.New().String())
+		c.Request = req
 
 		CreateBoolean(c)
 		assert.Equal(t, response.Code, http.StatusBadRequest)
@@ -48,6 +113,12 @@ func TestCreateBooleanBadRequest(t *testing.T) {
 
 func TestCreateBooleanStatusInternalServerError(t *testing.T) {
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true)
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -60,7 +131,10 @@ func TestCreateBooleanStatusInternalServerError(t *testing.T) {
 	assert.Nil(t, err)
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 
 	CreateBoolean(c)
 	assert.Equal(t, response.Code, http.StatusInternalServerError)
@@ -76,8 +150,13 @@ func TestCreateBooleanStatusOK(t *testing.T) {
 			Value: new(bool),
 		},
 	}
-
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true).Times(len(testRequests))
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -92,7 +171,10 @@ func TestCreateBooleanStatusOK(t *testing.T) {
 		assert.Nil(t, err)
 		response := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(response)
-		c.Request, _ = http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+		req, err := http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+		assert.Nil(t, err)
+		req.Header.Add("Authorization", "Token "+uuid.New().String())
+		c.Request = req
 
 		CreateBoolean(c)
 		assert.Equal(t, response.Code, http.StatusOK)
@@ -107,10 +189,35 @@ func TestCreateBooleanStatusOK(t *testing.T) {
 	}
 }
 
+func TestGetBooleanStatusForbidden(t *testing.T) {
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(false)
+
+	response := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(response)
+	req, err := http.NewRequest(http.MethodGet, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
+
+	GetBoolean(c)
+	assert.Equal(t, response.Code, http.StatusForbidden)
+
+}
+
 func TestGetBooleanStatusNotFound(t *testing.T) {
 	id := uuid.New().String()
 
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true)
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -118,7 +225,10 @@ func TestGetBooleanStatusNotFound(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodGet, "", nil)
+	req, err := http.NewRequest(http.MethodGet, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: id},
 	}
@@ -131,13 +241,22 @@ func TestGetBooleanStatusNotFound(t *testing.T) {
 func TestGetBooleanStatusInternalServerError(t *testing.T) {
 	ctl := gomock.NewController(t)
 	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true)
+
+	ctl = gomock.NewController(t)
+	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
 	mockbooleanRepoInterface.EXPECT().GetBooleanByID(gomock.Any()).Return(models.Boolean{}, errors.New("some kind of internal error"))
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodGet, "", nil)
+	req, err := http.NewRequest(http.MethodGet, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: uuid.New().String()},
 	}
@@ -156,13 +275,22 @@ func TestGetBooleanStatusOK(t *testing.T) {
 
 	ctl := gomock.NewController(t)
 	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true)
+
+	ctl = gomock.NewController(t)
+	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
 	mockbooleanRepoInterface.EXPECT().GetBooleanByID(boolean.ID).Return(boolean, nil)
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodGet, "", nil)
+	req, err := http.NewRequest(http.MethodGet, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: boolean.ID},
 	}
@@ -171,11 +299,30 @@ func TestGetBooleanStatusOK(t *testing.T) {
 	assert.Equal(t, response.Code, http.StatusOK)
 
 	var responseBoolean models.Boolean
-	err := json.Unmarshal(response.Body.Bytes(), &responseBoolean)
+	err = json.Unmarshal(response.Body.Bytes(), &responseBoolean)
 	assert.Nil(t, err)
 	assert.Equal(t, responseBoolean.ID, boolean.ID)
 	assert.Equal(t, responseBoolean.Value, boolean.Value)
 	assert.Equal(t, responseBoolean.Key, boolean.Key)
+
+}
+
+func TestUpdateBooleanStatusForbidden(t *testing.T) {
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(false)
+
+	response := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(response)
+	req, err := http.NewRequest(http.MethodPatch, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
+
+	UpdateBoolean(c)
+	assert.Equal(t, response.Code, http.StatusForbidden)
 
 }
 
@@ -190,6 +337,12 @@ func TestUpdateBooleanStatusBadRequest(t *testing.T) {
 		},
 	}
 
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true).Times(len(testRequests))
+
 	for _, testRequest := range testRequests {
 
 		jsonRequest, err := json.Marshal(booleanRequest{
@@ -200,7 +353,10 @@ func TestUpdateBooleanStatusBadRequest(t *testing.T) {
 
 		response := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(response)
-		c.Request, _ = http.NewRequest(http.MethodGet, "", bytes.NewBuffer(jsonRequest))
+		req, err := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(jsonRequest))
+		assert.Nil(t, err)
+		req.Header.Add("Authorization", "Token "+uuid.New().String())
+		c.Request = req
 		c.Params = gin.Params{
 			{Key: "id", Value: testRequest.ID},
 		}
@@ -214,6 +370,12 @@ func TestUpdateBooleanStatusBadRequest(t *testing.T) {
 func TestUpdateBooleanStatusNotFound(t *testing.T) {
 	ctl := gomock.NewController(t)
 	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true)
+
+	ctl = gomock.NewController(t)
+	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
 	mockbooleanRepoInterface.EXPECT().GetBooleanByID(gomock.Any()).Return(models.Boolean{}, errors.New("record not found"))
@@ -226,7 +388,10 @@ func TestUpdateBooleanStatusNotFound(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(jsonRequest))
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: uuid.New().String()},
 	}
@@ -238,6 +403,12 @@ func TestUpdateBooleanStatusNotFound(t *testing.T) {
 
 func TestUpdateBooleanStatusInternalServerError(t *testing.T) {
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true).Times(2)
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -256,7 +427,10 @@ func TestUpdateBooleanStatusInternalServerError(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(jsonRequest))
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: uuid.New().String()},
 	}
@@ -265,7 +439,10 @@ func TestUpdateBooleanStatusInternalServerError(t *testing.T) {
 
 	response = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodPost, "", bytes.NewBuffer(jsonRequest))
+	req, err = http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(jsonRequest))
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: uuid.New().String()},
 	}
@@ -275,20 +452,25 @@ func TestUpdateBooleanStatusInternalServerError(t *testing.T) {
 }
 
 func TestUpdateBooleanStatusOK(t *testing.T) {
-	values := []bool{true, false}
 	testRequests := []models.Boolean{
 		{
 			ID:    uuid.New().String(),
-			Value: &values[0],
+			Value: new(bool),
 			Key:   "This is test1",
 		},
 		{
 			ID:    uuid.New().String(),
-			Value: &values[1],
+			Value: new(bool),
 		},
 	}
 
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true).Times(len(testRequests))
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -310,7 +492,10 @@ func TestUpdateBooleanStatusOK(t *testing.T) {
 
 		response := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(response)
-		c.Request, _ = http.NewRequest(http.MethodGet, "", bytes.NewBuffer(jsonRequest))
+		req, err := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(jsonRequest))
+		assert.Nil(t, err)
+		req.Header.Add("Authorization", "Token "+uuid.New().String())
+		c.Request = req
 		c.Params = gin.Params{
 			{Key: "id", Value: testRequest.ID},
 		}
@@ -333,10 +518,35 @@ func TestUpdateBooleanStatusOK(t *testing.T) {
 	}
 }
 
+func TestDeleteBooleanStatusForbidden(t *testing.T) {
+	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(false)
+
+	response := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(response)
+	req, err := http.NewRequest(http.MethodDelete, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
+
+	DeleteBoolean(c)
+	assert.Equal(t, response.Code, http.StatusForbidden)
+
+}
+
 func TestDeleteBooleanStatusNotFound(t *testing.T) {
 	id := uuid.New().String()
 
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true)
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -344,7 +554,10 @@ func TestDeleteBooleanStatusNotFound(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodDelete, "", nil)
+	req, err := http.NewRequest(http.MethodDelete, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: id},
 	}
@@ -355,8 +568,13 @@ func TestDeleteBooleanStatusNotFound(t *testing.T) {
 }
 
 func TestDeleteBooleanStatusInternalServerError(t *testing.T) {
-
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true).Times(2)
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -368,7 +586,10 @@ func TestDeleteBooleanStatusInternalServerError(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodDelete, "", nil)
+	req, err := http.NewRequest(http.MethodDelete, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: uuid.New().String()},
 	}
@@ -386,8 +607,13 @@ func TestDeleteBooleanStatusNoContent(t *testing.T) {
 		Value: new(bool),
 		Key:   "test 1",
 	}
-
 	ctl := gomock.NewController(t)
+	defer ctl.Finish()
+	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
+	auth.TokenRepo = mocktokeRepoInterface
+	mocktokeRepoInterface.EXPECT().ExistToken(gomock.Any()).Return(true)
+
+	ctl = gomock.NewController(t)
 	defer ctl.Finish()
 	mockbooleanRepoInterface := mocks.NewMockbooleanRepoInterface(ctl)
 	models.BooleanRepo = mockbooleanRepoInterface
@@ -398,7 +624,10 @@ func TestDeleteBooleanStatusNoContent(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(response)
-	c.Request, _ = http.NewRequest(http.MethodDelete, "", nil)
+	req, err := http.NewRequest(http.MethodDelete, "", nil)
+	assert.Nil(t, err)
+	req.Header.Add("Authorization", "Token "+uuid.New().String())
+	c.Request = req
 	c.Params = gin.Params{
 		{Key: "id", Value: boolean.ID},
 	}
