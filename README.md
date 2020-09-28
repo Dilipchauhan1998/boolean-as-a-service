@@ -88,59 +88,67 @@ __Start boolean service__
      ```
 
 ## API
-__base url__
 ```
-  http://localhost:80
+ base url: http://localhost/ 
 ```
-use __POST /__ method to create a new boolean
-__request:__
+use __POST/token__ method to create a token to get started <br />
+
+```
+ $ curl -X POST http://localhost/token
+```
+__response__
 ```
  {
-   "value":true,
-    "key": "name" // this is optional
+    "token": "e5a300c0-d444-4fa4-a78d-257c5e8b7d04"
  }
 ```
+use __POST/__ method to create a new boolean
+
+```
+$  curl -X POST http://localhost --header "Content-Type: application/json" --data '{"value": true, "key": "name"}' --header "Authorization: Token e5a300c0-d444-4fa4-a78d-257c5e8b7d04"
+```
+
 - value should be either true or false(boolean, not string) <br />
-- key should be string <br />
+- key is optional and should be string <br />
 
 __response:__
 ```
- {
-   "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-   "value": true,
-   "key": "name"
- }
+  {
+     "id":"eae36719-02e8-42a4-8309-a3aabf70c810",
+     "value":true,
+     "key":"name"
+  }
 ```
-
-
 use __GET /:id__ method to get an existing boolean
-__response:__
 ```
- {
-   "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-   "value": true,
-   "key": "name"
- }
+ $ curl http://localhost/eae36719-02e8-42a4-8309-a3aabf70c810 --header "Authorization: Token e5a300c0-d444-4fa4-a78d-257c5e8b7d04"
+```
+__response__
+```
+    {
+      "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
+      "value": true,
+      "key": "name"
+    }
 ```
 use __PATCH /:id__ method to update an existing boolean
-__request:__
+
 ```
- {
-   "value":false,
-   "key": "new name" // this is optional
- }
+ $ curl -X PATCH http://localhost/eae36719-02e8-42a4-8309-a3aabf70c810 --header "Content-Type: application/json" --data '{"value": true, "key": "new name"}' --header "Authorization: Token e5a300c0-d444-4fa4-a78d-257c5e8b7d04"
 ```
 __response:__
 ```
- {
-   "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
-   "value": false,
-   "key": "new name"
- }
+   {
+       "id":"eae36719-02e8-42a4-8309-a3aabf70c810",
+       "value":true,
+       "key":"new name"
+   }
 ```
 use __DELETE /:id__ method to delete an existing boolean
+```
+ $ curl -X DELETE http://localhost/eae36719-02e8-42a4-8309-a3aabf70c810 --header "Authorization: Token e5a300c0-d444-4fa4-a78d-257c5e8b7d04"
+```
 __response:__
 ```
  HTTP 204 No Content
 ```
-
