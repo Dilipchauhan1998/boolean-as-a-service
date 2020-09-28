@@ -96,7 +96,7 @@ use __POST/token__ method to create a token to get started <br />
 ```
  $ curl -X POST http://localhost/token
 ```
-__response__
+__response:__
 ```
  {
     "token": "e5a300c0-d444-4fa4-a78d-257c5e8b7d04"
@@ -123,7 +123,7 @@ use __GET /:id__ method to get an existing boolean
 ```
  $ curl http://localhost/eae36719-02e8-42a4-8309-a3aabf70c810 --header "Authorization: Token e5a300c0-d444-4fa4-a78d-257c5e8b7d04"
 ```
-__response__
+__response:__
 ```
     {
       "id":"b7f32a21-b863-4dd1-bd86-e99e8961ffc6",
