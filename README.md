@@ -152,3 +152,12 @@ __response:__
 ```
  HTTP 204 No Content
 ```
+## HTTP status code returned
+ Status Code | Explaination |
+| ------- | --- |
+| 200 | POST ,GET, PATCH request is successful |
+| 204 | DELETE request is successful |
+| 400 | request is not in proper format |
+| 403 | Authentication criteria not met |
+| 404 | GET, PATCH, DELETE request's id doesn't exist|
+| 500 | internal server error|
