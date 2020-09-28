@@ -153,7 +153,7 @@ __response:__
  HTTP 204 No Content
 ```
 ## HTTP status code returned
- Status Code | Explaination |
+ Status Code | Explanation |
 | ------- | --- |
 | 200 | POST ,GET, PATCH request is successful |
 | 204 | DELETE request is successful |
