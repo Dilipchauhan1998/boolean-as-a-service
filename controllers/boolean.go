@@ -30,7 +30,6 @@ func CreateToken(c *gin.Context) {
 //CreateBoolean  create a boolean
 func CreateBoolean(c *gin.Context) {
 	var boolean models.Boolean
-
 	if value, _ := c.Request.Header["Authorization"]; len(value) == 0 || !auth.TokenRepo.ExistToken(strings.Split(value[0], " ")[1]) {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
