@@ -9,7 +9,7 @@ import (
 //SetupRouter Configure routes, returns the router
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-
+	r.POST("/token", controllers.CreateToken)
 	r.POST("/", controllers.CreateBoolean)
 	r.GET("/:id", controllers.GetBoolean)
 	r.PATCH("/:id", controllers.UpdateBoolean)
