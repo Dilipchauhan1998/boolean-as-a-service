@@ -43,7 +43,7 @@ export MYSQL_DB_NAME="database_name"
     ```
 - Install all required packages
     ```sh
-     $ go mode download
+     $ go mod download
     ```
 - Run below command for setting database related ENVIRONMENT variables
     ```sh
