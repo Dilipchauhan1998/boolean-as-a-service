@@ -31,7 +31,7 @@ func CreateToken(c *gin.Context) {
 func CreateBoolean(c *gin.Context) {
 	var boolean models.Boolean
 	if value, _ := c.Request.Header["Authorization"]; len(value) == 0 || !auth.TokenRepo.ExistToken(strings.Split(value[0], " ")[1]) {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
@@ -56,7 +56,7 @@ func GetBoolean(c *gin.Context) {
 		err     error
 	)
 	if value, _ := c.Request.Header["Authorization"]; len(value) == 0 || !auth.TokenRepo.ExistToken(strings.Split(value[0], " ")[1]) {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
@@ -82,7 +82,7 @@ func UpdateBoolean(c *gin.Context) {
 	)
 
 	if value, _ := c.Request.Header["Authorization"]; len(value) == 0 || !auth.TokenRepo.ExistToken(strings.Split(value[0], " ")[1]) {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
@@ -120,7 +120,7 @@ func UpdateBoolean(c *gin.Context) {
 //DeleteBoolean ... delete a boolean
 func DeleteBoolean(c *gin.Context) {
 	if value, _ := c.Request.Header["Authorization"]; len(value) == 0 || !auth.TokenRepo.ExistToken(strings.Split(value[0], " ")[1]) {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
