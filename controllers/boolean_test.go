@@ -58,7 +58,7 @@ func TestCreateTokenStatusOK(t *testing.T) {
 
 }
 
-func TestCreateBooleanStatusForbidden(t *testing.T) {
+func TestCreateBooleanStatusUnauthorized(t *testing.T) {
 	ctl := gomock.NewController(t)
 	defer ctl.Finish()
 	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
@@ -73,7 +73,7 @@ func TestCreateBooleanStatusForbidden(t *testing.T) {
 	c.Request = req
 
 	CreateBoolean(c)
-	assert.Equal(t, response.Code, http.StatusForbidden)
+	assert.Equal(t, response.Code, http.StatusUnauthorized)
 
 }
 
@@ -189,7 +189,7 @@ func TestCreateBooleanStatusOK(t *testing.T) {
 	}
 }
 
-func TestGetBooleanStatusForbidden(t *testing.T) {
+func TestGetBooleanStatusUnauthorized(t *testing.T) {
 	ctl := gomock.NewController(t)
 	defer ctl.Finish()
 	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
@@ -204,7 +204,7 @@ func TestGetBooleanStatusForbidden(t *testing.T) {
 	c.Request = req
 
 	GetBoolean(c)
-	assert.Equal(t, response.Code, http.StatusForbidden)
+	assert.Equal(t, response.Code, http.StatusUnauthorized)
 
 }
 
@@ -307,7 +307,7 @@ func TestGetBooleanStatusOK(t *testing.T) {
 
 }
 
-func TestUpdateBooleanStatusForbidden(t *testing.T) {
+func TestUpdateBooleanStatusUnauthorized(t *testing.T) {
 	ctl := gomock.NewController(t)
 	defer ctl.Finish()
 	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
@@ -322,7 +322,7 @@ func TestUpdateBooleanStatusForbidden(t *testing.T) {
 	c.Request = req
 
 	UpdateBoolean(c)
-	assert.Equal(t, response.Code, http.StatusForbidden)
+	assert.Equal(t, response.Code, http.StatusUnauthorized)
 
 }
 
@@ -518,7 +518,7 @@ func TestUpdateBooleanStatusOK(t *testing.T) {
 	}
 }
 
-func TestDeleteBooleanStatusForbidden(t *testing.T) {
+func TestDeleteBooleanStatusUnauthorized(t *testing.T) {
 	ctl := gomock.NewController(t)
 	defer ctl.Finish()
 	mocktokeRepoInterface := mocks.NewMocktokenRepoInterface(ctl)
@@ -533,7 +533,7 @@ func TestDeleteBooleanStatusForbidden(t *testing.T) {
 	c.Request = req
 
 	DeleteBoolean(c)
-	assert.Equal(t, response.Code, http.StatusForbidden)
+	assert.Equal(t, response.Code, http.StatusUnauthorized)
 
 }
 
