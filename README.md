@@ -15,7 +15,7 @@ To install go on macOS follow [install go](https://www.geeksforgeeks.org/how-to-
 
 - Create a new user
 ```
-mysql> CREATE USER 'usernamer'@'localhost' IDENTIFIED BY 'password';
+mysql> CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
 ```
 - Create a database
 ```
