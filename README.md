@@ -27,7 +27,7 @@ mysql> GRANT ALL PRIVILEGES ON database_name.* TO 'username'@'localhost' identif
 mysql> FLUSH PRIVILEGES;
 ```
 
-- Edit the following lines in the files ".env":
+- Edit the following lines in the file ".env":
 
 ```
 export MYSQL_DB_USER="username"     
