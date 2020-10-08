@@ -39,7 +39,7 @@ export MYSQL_DB_NAME="database_name"
 - Clone the repository and keep it in the $GOPATH
 - Open the terminal and ``` cd ``` to the cloned repository directory
     ```sh
-     $ cd paths/boolean-as-a-service
+     $ cd path/boolean-as-a-service
     ```
 - Install all required packages
     ```sh
@@ -64,7 +64,7 @@ Go to [boolean](https://hub.docker.com/r/dilipchauhan1998/boolean) for the docke
 __Create docker image__
 - Clone the repository and ```cd``` to the cloned repository directory 
     ```sh
-    $ cd paths/boolean-as-a-service
+    $ cd path/boolean-as-a-service
     ```
 - Run below command to create image
      ```sh
