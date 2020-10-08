@@ -153,7 +153,7 @@ __response:__
  HTTP 204 No Content
 ```
 ### Note
-if you are using postman then use Bearer token for Authorization
+if you are using __postman__ then use __Bearer token__ for __Authorization__
 ## HTTP status code returned
  Status Code | Explanation |
 | ------- | --- |
