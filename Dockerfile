@@ -44,6 +44,7 @@ RUN mkdir $GOPATH/boolean-as-a-service
 
 COPY . .$GOPATH/boolean-as-a-service
 WORKDIR $GOPATH/boolean-as-a-service
+RUN go mod download
 
 ENTRYPOINT ["/root/startup.sh"]
-CMD ["/usr/bin/mysqld_safe"] 
+CMD ["/usr/bin/mysqld_safe"]  
